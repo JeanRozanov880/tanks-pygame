@@ -290,7 +290,7 @@ class WoodBoxes:
 
         self.wood_positions = [
             (230, 0), (0, 260), (920, 660), (700, 920),
-            (102, 778), (90 + self.wood_size * 2, 778), (765, 102), (778 - self.wood_size * 2, 102),
+            (102, 840), (90 + self.wood_size * 2, 840), (765, 102), (778 - self.wood_size * 2, 102),
             (115, 515), (120 + self.wood_size - 11, 515), (107 + self.wood_size * 3 - 11, 515),
             (108 + self.wood_size * 4 - 17, 515),
             (550, 515 - self.wood_size + 8), (550 + self.wood_size - 8, 515 - self.wood_size + 8),
@@ -337,7 +337,7 @@ class BetBoxes:
 
         self.bet_positions = [
             (233, self.wood_size - 3), (self.wood_size - 3, 263), (855, 663), (703, 855),
-            (100 + self.wood_size, 775 + self.wood_size), (775 - self.wood_size, 111 - self.wood_size),
+            (100 + self.wood_size, 835 + self.wood_size), (775 - self.wood_size, 111 - self.wood_size),
             (105 + self.wood_size * 2, 518), (117, 523 - self.wood_size),
             (96 + self.wood_size * 8, 526 - self.wood_size), (87 + self.wood_size * 10, 520)
         ]
@@ -369,9 +369,9 @@ class Tree:  # класс для куста. позволяет танку ст�
     def __init__(self):
         self.tree_surf = pg.image.load("images/tree.png")
         self.tree_surf = pg.transform.scale(self.tree_surf,
-                                                (self.tree_surf.get_width() / 7,
-                                                 self.tree_surf.get_height() / 7))
-        self.tree_size = self.tree_surf.get_width() / 7
+                                            (self.tree_surf.get_width() / 6,
+                                             self.tree_surf.get_height() / 6))
+        self.tree_size = self.tree_surf.get_width() / 6
         self.wood_size = 740 / 10
 
         self.tree_positions = [
@@ -382,12 +382,11 @@ class Tree:  # класс для куста. позволяет танку ст�
         ]
         self.cnt_trees = 10  # 16
         self.tree_rects = [pg.Rect(x, y, self.tree_size, self.tree_size)
-                          for x, y in self.tree_positions[:self.cnt_trees]]
+                           for x, y in self.tree_positions[:self.cnt_trees]]
 
     def draw_trees(self, screen):
         for rect in self.tree_rects:
             screen.blit(self.tree_surf, rect)
-
 
 
 def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts):
@@ -400,6 +399,7 @@ def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, 
             red_hearts.lose_life()
             bul_blue.flag_active = False  # деактивируем пулю после попадания
             bullets_blue.remove(bul_blue)  # удаляем пулю из списка
+            tank_explode.play()
             return True  # возвращаем тру, чтобы показать, что было попадание
 
     # обработка красных пуль (выстрелы красного танка)
@@ -411,6 +411,7 @@ def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, 
             blue_hearts.lose_life()
             bul_red.flag_active = False  # деактивируем пулю после попадания
             bullets_red.remove(bul_red)  # удаляем пулю из списка
+            tank_explode.play()
             return True  # возвращаем тру, чтобы показать, что было попадание
 
     return False
@@ -447,6 +448,7 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                               b_rect.top - bul_blue.bullet_rect.top)
                     if bet_box.bet_mask.overlap(bul_blue.mask, offset):
                         bullet_hit = True
+                        metal_strike.play()
                         break
 
         # если пуля попала в коробку, деактивируем ее
@@ -468,6 +470,7 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                     if w_rect in wood_box.wood_rects:
                         wood_box.wood_rects.remove(w_rect)
                         wood_box.cnt_wood_boxes -= 1
+                        wood_broke.play()
                     break
 
         # проверяем столкновение с бетонными коробки (не удаляем их)
@@ -478,6 +481,7 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                               b_rect.top - bul_red.bullet_rect.top)
                     if bet_box.bet_mask.overlap(bul_red.mask, offset):
                         bullet_hit = True
+                        metal_strike.play()
                         break
 
         # если пуля попала в коробку, деактивируем ее
@@ -485,10 +489,23 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
             bul_red.flag_active = False
 
 
+def show_start_screen():
+    overlay = pg.Surface((W, H), pg.SRCALPHA)
+    overlay.fill((0, 0, 0, 128))
+    screen.blit(overlay, (0, 0))
+    start_text_blue = font.render('Управление синим танком: WASD, стрельба - ПРОБЕЛ', True, (255, 255, 255))
+    start_text_red = font.render('Управление красным танком: стрелки, стрельба - правый Enter', True, (255, 255, 255))
+    screen.blit(start_text_blue, (W // 1.5, H // 1.5))
+    screen.blit(start_text_red, (W // 3, H // 3))
+
+    pg.display.update()
+
+
 pg.init()
 
-
 wood_broke = pg.mixer.Sound('sounds/wood_broke.wav')
+metal_strike = pg.mixer.Sound('sounds/strike_metal.wav')
+tank_explode = pg.mixer.Sound('sounds/tank_explode.wav')
 shot = pg.mixer.Sound('sounds/tank_shot.wav')
 pg.mixer.music.load('sounds/tank_music_backgr.wav')
 pg.mixer.music.play(-1)
@@ -536,6 +553,8 @@ def reset_game():
     winner = ""
 
 
+show_start_screen()
+
 while flag_play:
     clock.tick(FPS)
 
@@ -556,13 +575,13 @@ while flag_play:
         if keys[pg.K_a]:
             tank.rect_1 = tank.flip2_blue()
             tank.move_1(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_d]:
+        elif keys[pg.K_d]:
             tank.rect_1 = tank.flip1_blue()
             tank.move_1(dx=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_w]:
+        elif keys[pg.K_w]:
             tank.rect_1 = tank.flip3_blue()
             tank.move_1(dy=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_s]:
+        elif keys[pg.K_s]:
             tank.rect_1 = tank.flip4_blue()
             tank.move_1(dy=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
 
@@ -574,13 +593,13 @@ while flag_play:
         if keys[pg.K_LEFT]:
             tank.rect_2 = tank.flip2_red()
             tank.move_2(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_RIGHT]:
+        elif keys[pg.K_RIGHT]:
             tank.rect_2 = tank.flip1_red()
             tank.move_2(dx=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_UP]:
+        elif keys[pg.K_UP]:
             tank.rect_2 = tank.flip3_red()
             tank.move_2(dy=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
-        if keys[pg.K_DOWN]:
+        elif keys[pg.K_DOWN]:
             tank.rect_2 = tank.flip4_red()
             tank.move_2(dy=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
 
@@ -606,7 +625,6 @@ while flag_play:
     blue_hearts.draw(screen)
     red_hearts.draw(screen)
     tank.draw(screen)
-
 
     for bullet in bullets_blue:
         bullet.fly()
