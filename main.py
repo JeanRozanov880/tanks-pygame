@@ -487,6 +487,7 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
 
 pg.init()
 
+
 wood_broke = pg.mixer.Sound('sounds/wood_broke.wav')
 shot = pg.mixer.Sound('sounds/tank_shot.wav')
 pg.mixer.music.load('sounds/tank_music_backgr.wav')
@@ -495,6 +496,9 @@ pg.mixer.music.play(-1)
 screen = pg.display.set_mode((W, H))
 pg.display.set_caption("Tanks")
 clock = pg.time.Clock()
+
+background_image = pg.image.load('images/background.jpg').convert()
+background_image = pg.transform.scale(background_image, (W, H))
 
 tank = Tank()
 blue_hearts = HeartsDisplay("blue")
@@ -591,7 +595,7 @@ while flag_play:
         # проверка столкновений пуль с блоками
         collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_boxes)
 
-    screen.fill(BG)
+    screen.blit(background_image, (0, 0))
 
     # отрисовываем все коробки
     for w_box in wood_boxes:
