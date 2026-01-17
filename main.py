@@ -365,6 +365,31 @@ class BetBoxes:
             screen.blit(self.bet_surf, rect)
 
 
+class Tree:  # класс для куста. позволяет танку стать невидимым
+    def __init__(self):
+        self.tree_surf = pg.image.load("images/tree.png")
+        self.tree_surf = pg.transform.scale(self.tree_surf,
+                                                (self.tree_surf.get_width() / 7,
+                                                 self.tree_surf.get_height() / 7))
+        self.tree_size = self.tree_surf.get_width() / 7
+        self.wood_size = 740 / 10
+
+        self.tree_positions = [
+            (182, self.wood_size * 1.2), (self.wood_size * 1.45, 182), (656, 688), (695, 600),  # боковые кусты
+            (40, 518 + self.wood_size * 1.2), (132 + self.tree_size, 518 + self.wood_size * 1.2),
+            (250 + self.tree_size, 518 + self.wood_size * 1.2),  # левые центральные кусты
+            (518 + self.wood_size * 3.3, 160), (518 + self.wood_size * 1.7, 160), (518, 160)
+        ]
+        self.cnt_trees = 10  # 16
+        self.tree_rects = [pg.Rect(x, y, self.tree_size, self.tree_size)
+                          for x, y in self.tree_positions[:self.cnt_trees]]
+
+    def draw_trees(self, screen):
+        for rect in self.tree_rects:
+            screen.blit(self.tree_surf, rect)
+
+
+
 def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts):
     # обработка синих пуль (выстрелы синего танка)
     for bul_blue in bullets_blue[:]:  # копия списка
@@ -397,11 +422,11 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
     bet_box = bet_boxes[0]
 
     # обрабатываем синие пули
-    for bul_blue in bullets_blue[:]:  # Используем копию списка для безопасного удаления
+    for bul_blue in bullets_blue[:]:  # используем копию списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
-        for w_rect in wood_box.wood_rects[:]:  # Используем копию для безопасного удаления
+        for w_rect in wood_box.wood_rects[:]:  # используем копию для безопасного удаления
             if bul_blue.bullet_rect.colliderect(w_rect):
                 offset = (w_rect.left - bul_blue.bullet_rect.left,
                           w_rect.top - bul_blue.bullet_rect.top)
@@ -411,6 +436,7 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                     if w_rect in wood_box.wood_rects:
                         wood_box.wood_rects.remove(w_rect)
                         wood_box.cnt_wood_boxes -= 1
+                        wood_broke.play()
                     break
 
         # проверяем столкновение с бетонными коробками (не удаляем их)
@@ -428,17 +454,17 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
             bul_blue.flag_active = False
 
     # обрабатываем красные пули
-    for bul_red in bullets_red[:]:  # Используем копию списка для безопасного удаления
+    for bul_red in bullets_red[:]:  # используем копию списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
-        for w_rect in wood_box.wood_rects[:]:  # Используем копию для безопасного удаления
+        for w_rect in wood_box.wood_rects[:]:  # используем копию для безопасного удаления
             if bul_red.bullet_rect.colliderect(w_rect):
                 offset = (w_rect.left - bul_red.bullet_rect.left,
                           w_rect.top - bul_red.bullet_rect.top)
                 if wood_box.wood_mask.overlap(bul_red.mask, offset):
                     bullet_hit = True
-                    # Удаляем деревянную коробку при попадании
+                    # удаляем деревянную коробку при попадании
                     if w_rect in wood_box.wood_rects:
                         wood_box.wood_rects.remove(w_rect)
                         wood_box.cnt_wood_boxes -= 1
@@ -460,17 +486,23 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
 
 
 pg.init()
+
+wood_broke = pg.mixer.Sound('sounds/wood_broke.wav')
+shot = pg.mixer.Sound('sounds/tank_shot.wav')
+pg.mixer.music.load('sounds/tank_music_backgr.wav')
+pg.mixer.music.play(-1)
+
 screen = pg.display.set_mode((W, H))
 pg.display.set_caption("Tanks")
 clock = pg.time.Clock()
 
-# Инициализация игровых объектов
 tank = Tank()
 blue_hearts = HeartsDisplay("blue")
 red_hearts = HeartsDisplay("red")
 
 wood_boxes = [WoodBoxes()]
 bet_boxes = [BetBoxes()]
+trees = [Tree()]
 
 bullets_blue = []
 bullets_red = []
@@ -490,7 +522,7 @@ def reset_game():
     blue_hearts.reset()
     red_hearts.reset()
 
-    # Создаем новые объекты коробок вместо очистки списков
+    # создаем новые объекты коробок вместо очистки списков
     wood_boxes = [WoodBoxes()]
     bet_boxes = [BetBoxes()]
 
@@ -533,6 +565,7 @@ while flag_play:
         if keys[pg.K_SPACE] and tank.can_shoot():
             tank.shoot()
             bullets_blue.append(Bullet(tank.rect_1, tank.direction_1, 1))
+            shot.play()
 
         if keys[pg.K_LEFT]:
             tank.rect_2 = tank.flip2_red()
@@ -550,6 +583,7 @@ while flag_play:
         if keys[pg.K_KP_ENTER] and tank.can_shoot():
             tank.shoot()
             bullets_red.append(Bullet(tank.rect_2, tank.direction_2, 2))
+            shot.play()
 
         # проверка столкновений пуль с танками
         collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts)
@@ -569,6 +603,7 @@ while flag_play:
     red_hearts.draw(screen)
     tank.draw(screen)
 
+
     for bullet in bullets_blue:
         bullet.fly()
         bullet.draw(screen)
@@ -576,6 +611,9 @@ while flag_play:
     for bullet in bullets_red:
         bullet.fly()
         bullet.draw(screen)
+
+    for tree in trees:
+        tree.draw_trees(screen)
 
     bullets_blue = [bullet for bullet in bullets_blue if bullet.is_active()]
     bullets_red = [bullet for bullet in bullets_red if bullet.is_active()]
@@ -591,7 +629,7 @@ while flag_play:
     # отображаем экран конца игры
     if game_over:
         overlay = pg.Surface((W, H), pg.SRCALPHA)
-        overlay.fill((0, 0, 0, 128))  # Полупрозрачный черный
+        overlay.fill((0, 0, 0, 128))
         screen.blit(overlay, (0, 0))
 
         # отображаем победителя
