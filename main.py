@@ -490,15 +490,44 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
 
 
 def show_start_screen():
-    overlay = pg.Surface((W, H), pg.SRCALPHA)
-    overlay.fill((0, 0, 0, 128))
-    screen.blit(overlay, (0, 0))
-    start_text_blue = font.render('Управление синим танком: WASD, стрельба - ПРОБЕЛ', True, (255, 255, 255))
-    start_text_red = font.render('Управление красным танком: стрелки, стрельба - правый Enter', True, (255, 255, 255))
-    screen.blit(start_text_blue, (W // 1.5, H // 1.5))
-    screen.blit(start_text_red, (W // 3, H // 3))
+    waiting = True
+    while waiting:
+        screen.blit(background_image, (0, 0))
 
-    pg.display.update()
+        overlay = pg.Surface((W, H), pg.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # Более темный для лучшей читаемости
+        screen.blit(overlay, (0, 0))
+
+        title_font = pg.font.Font(None, 72)
+        title_text = title_font.render('ТАНКИ', True, (255, 255, 0))
+        screen.blit(title_text, (W // 2 - title_text.get_width() // 2, H // 4))
+
+        font = pg.font.Font(None, 45)
+        start_text_blue = font.render('Управление синим танком: WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
+        start_text_red = font.render('Управление красным танком: стрелки, стрельба - правый Enter', True,
+                                     (255, 100, 100))
+
+        # позиционируем текст
+        screen.blit(start_text_blue, (W // 2 - start_text_blue.get_width() // 2, H // 2))
+        screen.blit(start_text_red, (W // 2 - start_text_red.get_width() // 2, H // 2 + 40))
+
+        # Инструкция для начала
+        start_info = font.render('Нажмите любую клавишу для начала игры', True, (255, 255, 255))
+        screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H * 3 // 4))
+
+        pg.display.update()
+
+        # обработка событий в стартовом экране
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+            if event.type == pg.KEYDOWN:
+                waiting = False  # Выходим из цикла ожидания
+
+
+def show_screen_for_choose_skins():  # функция для выбора скинов танков
+    skin_surf = pg.image.load('images/green_tank.png')
 
 
 pg.init()
@@ -516,6 +545,8 @@ clock = pg.time.Clock()
 
 background_image = pg.image.load('images/background.jpg').convert()
 background_image = pg.transform.scale(background_image, (W, H))
+win_font = pg.font.Font(None, 36)
+show_start_screen()
 
 tank = Tank()
 blue_hearts = HeartsDisplay("blue")
@@ -527,8 +558,6 @@ trees = [Tree()]
 
 bullets_blue = []
 bullets_red = []
-
-font = pg.font.Font(None, 36)
 
 game_over = False
 winner = ''
@@ -552,8 +581,6 @@ def reset_game():
     game_over = False
     winner = ""
 
-
-show_start_screen()
 
 while flag_play:
     clock.tick(FPS)
@@ -655,8 +682,8 @@ while flag_play:
         screen.blit(overlay, (0, 0))
 
         # отображаем победителя
-        winner_text = font.render(f"Победитель: {winner}!", True, (255, 255, 255))
-        restart_text = font.render("Нажмите R для рестарта", True, (255, 255, 255))
+        winner_text = win_font.render(f"Победитель: {winner}!", True, (255, 255, 255))
+        restart_text = win_font.render("Нажмите R для рестарта", True, (255, 255, 255))
 
         screen.blit(winner_text, (W // 2 - winner_text.get_width() // 2, H // 2 - 50))
         screen.blit(restart_text, (W // 2 - restart_text.get_width() // 2, H // 2 + 20))
