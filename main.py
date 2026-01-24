@@ -8,12 +8,17 @@ bullet_speed = 6
 HEART_SIZE = 40
 MAX_LIVES = 3
 HEART_SPACING = 10
-
+waiting_for_choose = True
+red_tank = None
+blue_tank = None
+green_tank = None
+purple_tank = None
+orange_tank = None
 
 class Tank:
-    def __init__(self):
+    def __init__(self, player1, player2):
         # загрузка и масштабирование синего танка
-        self.surf_1 = pg.image.load('images/blue_tank.png').convert_alpha()
+        self.surf_1 = pg.image.load(player1).convert_alpha()
         self.new_surf_1 = pg.transform.scale(self.surf_1,
                                              (self.surf_1.get_width() / 8,
                                               self.surf_1.get_height() / 8))
@@ -23,7 +28,7 @@ class Tank:
         self.direction_1 = 0
 
         # загрузка и масштабирование красного танка
-        self.surf_2 = pg.image.load('images/red_tank.png').convert_alpha()
+        self.surf_2 = pg.image.load(player2).convert_alpha()
         self.new_surf_2 = pg.transform.scale(self.surf_2,
                                              (self.surf_2.get_width() / 8,
                                               self.surf_2.get_height() / 8))
@@ -495,7 +500,7 @@ def show_start_screen():
         screen.blit(background_image, (0, 0))
 
         overlay = pg.Surface((W, H), pg.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))  # Более темный для лучшей читаемости
+        overlay.fill((0, 0, 0, 180))
         screen.blit(overlay, (0, 0))
 
         title_font = pg.font.Font(None, 72)
@@ -511,7 +516,6 @@ def show_start_screen():
         screen.blit(start_text_blue, (W // 2 - start_text_blue.get_width() // 2, H // 2))
         screen.blit(start_text_red, (W // 2 - start_text_red.get_width() // 2, H // 2 + 40))
 
-        # Инструкция для начала
         start_info = font.render('Нажмите любую клавишу для начала игры', True, (255, 255, 255))
         screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H * 3 // 4))
 
@@ -523,11 +527,109 @@ def show_start_screen():
                 pg.quit()
                 exit()
             if event.type == pg.KEYDOWN:
-                waiting = False  # Выходим из цикла ожидания
-
+                waiting = False
 
 def show_screen_for_choose_skins():  # функция для выбора скинов танков
-    skin_surf = pg.image.load('images/green_tank.png')
+    global waiting_for_choose, red_tank, blue_tank, purple_tank, green_tank, orange_tank
+    green_surf = pg.image.load('images/green_tank.png').convert_alpha()
+    green_surf = pg.transform.scale(green_surf,
+                                             (green_surf.get_width() / 8,
+                                              green_surf.get_height() / 8))
+    green_rect_1 = green_surf.get_rect(center=(W / 12, H / 7))
+    green_rect_2 = green_surf.get_rect(center=(W / 1.1, H / 1.2))
+
+
+    purple_surf = pg.image.load('images/purple_tank.png').convert_alpha()
+    purple_surf = pg.transform.scale(purple_surf,
+                                             (purple_surf.get_width() / 8,
+                                              purple_surf.get_height() / 8))
+    purple_rect_1 = purple_surf.get_rect(center=(W / 5, H / 7))
+    purple_rect_2 = purple_surf.get_rect(center=(W / 1.28, H / 1.2))
+
+
+    orange_surf = pg.image.load('images/orange_tank.png').convert_alpha()
+    orange_surf = pg.transform.scale(orange_surf,
+                                             (orange_surf.get_width() / 8,
+                                              orange_surf.get_height() / 8))
+    orange_rect_1 = orange_surf.get_rect(center=(W / 3.1, H / 7))
+    orange_rect_2 = orange_surf.get_rect(center=(W / 1.53, H / 1.2))
+
+
+    blue_surf = pg.image.load('images/blue_tank.png').convert_alpha()
+    blue_surf = pg.transform.scale(blue_surf,
+                                             (blue_surf.get_width() / 8,
+                                              blue_surf.get_height() / 8))
+    blue_rect_1 = blue_surf.get_rect(center=(W / 2.2, H / 7))
+    blue_rect_2 = blue_surf.get_rect(center=(W / 1.9, H / 1.2))
+
+
+    red_surf = pg.image.load('images/red_tank.png').convert_alpha()
+    red_surf = pg.transform.scale(red_surf,
+                                             (red_surf.get_width() / 8,
+                                              red_surf.get_height() / 8))
+    red_rect_1 = red_surf.get_rect(center=(W / 1.7, H / 7))
+    red_rect_2 = red_surf.get_rect(center=(W / 2.5, H / 1.2))
+
+
+    font = pg.font.Font(None, 45)
+    while waiting_for_choose:
+        screen.blit(background_image, (0, 0))
+
+        overlay = pg.Surface((W, H), pg.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # тёмни
+
+        screen.blit(overlay, (0, 0))
+
+        # отрисовка скинов для 1-го игрока
+        screen.blit(green_surf, green_rect_1)
+        screen.blit(purple_surf, purple_rect_1)
+        screen.blit(orange_surf, orange_rect_1)
+        screen.blit(blue_surf, blue_rect_1)
+        screen.blit(red_surf, red_rect_1)
+
+        # отрисовка скинов для 2-го игрока
+        screen.blit(green_surf, green_rect_2)
+        screen.blit(purple_surf, purple_rect_2)
+        screen.blit(orange_surf, orange_rect_2)
+        screen.blit(blue_surf, blue_rect_2)
+        screen.blit(red_surf, red_rect_2)
+
+        skin_info = font.render('Выберите скин:', True, (255, 255, 255))
+        screen.blit(skin_info, (W // 2 - skin_info.get_width() // 2, H // 2))
+
+        pg.display.update()
+
+        # обработка событий в стартовом экране
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = event.pos
+                if green_rect_1.collidepoint(mouse_pos):
+                    green_tank = 'images/green_tank.png'
+                if green_rect_2.collidepoint(mouse_pos):
+                    green_tank = 'images/green_tank.png'
+                if red_rect_1.collidepoint(mouse_pos):
+                    red_tank = 'images/red_tank.png'
+                if red_rect_2.collidepoint(mouse_pos):
+                    red_tank = 'images/red_tank.png'
+                if blue_rect_1.collidepoint(mouse_pos):
+                    blue_tank = 'images/blue_tank.png'
+                if blue_rect_2.collidepoint(mouse_pos):
+                    blue_tank = 'images/blue_tank.png'
+                if orange_rect_1.collidepoint(mouse_pos):
+                    orange_tank = 'images/orange_tank.png'
+                if orange_rect_2.collidepoint(mouse_pos):
+                    orange_tank = 'images/orange_tank.png'
+                if purple_rect_1.collidepoint(mouse_pos):
+                    purple_tank = 'images/purple_tank.png'
+                if purple_rect_2.collidepoint(mouse_pos):
+                    purple_tank = 'images/purple_tank.png'
+
+            if event.type == pg.KEYDOWN:
+                waiting_for_choose = False
 
 
 pg.init()
@@ -546,9 +648,12 @@ clock = pg.time.Clock()
 background_image = pg.image.load('images/background.jpg').convert()
 background_image = pg.transform.scale(background_image, (W, H))
 win_font = pg.font.Font(None, 36)
-show_start_screen()
+show_screen_for_choose_skins()
 
-tank = Tank()
+if not waiting_for_choose:
+    show_start_screen()
+
+tank = Tank(blue_tank, green_tank)
 blue_hearts = HeartsDisplay("blue")
 red_hearts = HeartsDisplay("red")
 
@@ -558,6 +663,7 @@ trees = [Tree()]
 
 bullets_blue = []
 bullets_red = []
+
 
 game_over = False
 winner = ''
@@ -580,6 +686,7 @@ def reset_game():
     bullets_red.clear()
     game_over = False
     winner = ""
+
 
 
 while flag_play:
@@ -670,10 +777,10 @@ while flag_play:
     if not game_over:
         if not blue_hearts.is_alive():
             game_over = True
-            winner = "Красный танк"
+            winner = "Второй игрок"
         elif not red_hearts.is_alive():
             game_over = True
-            winner = "Синий танк"
+            winner = "Первый игрок"
 
     # отображаем экран конца игры
     if game_over:
