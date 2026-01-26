@@ -17,6 +17,11 @@ orange_tank = None
 
 class Tank:
     def __init__(self, player1, player2):
+        if player1 is None:
+            player1 = 'images/blue_tank.png'  # Значение по умолчанию для 1-го игрока
+        if player2 is None:
+            player2 = 'images/red_tank.png'  # Значение по умолчанию для 2-го игрока
+
         # загрузка и масштабирование синего танка
         self.surf_1 = pg.image.load(player1).convert_alpha()
         self.new_surf_1 = pg.transform.scale(self.surf_1,
