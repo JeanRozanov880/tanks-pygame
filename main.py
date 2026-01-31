@@ -542,6 +542,12 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     player1_skin = 'images/blue_tank.png'  # скин по умолчанию для 1-го игрока
     player2_skin = 'images/red_tank.png'  # скин по умолчанию для 2-го игрока
 
+    green_flag = False
+    red_flag = False
+    blue_flag = False
+    purple_flag = False
+    orange_flag = False
+
     # загружаем и масштабируем изображения танков
     green_surf = pg.image.load('images/green_tank.png').convert_alpha()
     green_surf = pg.transform.scale(green_surf, (green_surf.get_width() / 8, green_surf.get_height() / 8))
@@ -559,11 +565,11 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     red_surf = pg.transform.scale(red_surf, (red_surf.get_width() / 8, red_surf.get_height() / 8))
 
     # создаем прямоугольники для первого игрока (верхний ряд)
-    green_rect_1 = green_surf.get_rect(center=(W / 12, H / 4))
-    purple_rect_1 = purple_surf.get_rect(center=(W / 4.8, H / 4))
-    orange_rect_1 = orange_surf.get_rect(center=(W / 2.9, H / 4))
-    blue_rect_1 = blue_surf.get_rect(center=(W / 2.1, H / 4))
-    red_rect_1 = red_surf.get_rect(center=(W / 1.65, H / 4))
+    green_rect_1 = green_surf.get_rect(center=(W / 12, H / 3))
+    purple_rect_1 = purple_surf.get_rect(center=(W / 4.8, H / 3))
+    orange_rect_1 = orange_surf.get_rect(center=(W / 2.9, H / 3))
+    blue_rect_1 = blue_surf.get_rect(center=(W / 2.1, H / 3))
+    red_rect_1 = red_surf.get_rect(center=(W / 1.65, H / 3))
 
     # создаем прямоугольники для второго игрока (нижний ряд)
     green_rect_2 = green_surf.get_rect(center=(W / 12, H * 3 / 4))
@@ -573,7 +579,7 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     red_rect_2 = red_surf.get_rect(center=(W / 1.65, H * 3 / 4))
 
     font = pg.font.Font(None, 45)
-    small_font = pg.font.Font(None, 30)
+    players_font = pg.font.Font(None, 45)
 
     while waiting_for_choose:
         screen.blit(background_image, (0, 0))
@@ -587,6 +593,11 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         title_text = title_font.render('ВЫБЕРИТЕ СКИНЫ', True, (255, 255, 0))
         screen.blit(title_text, (W // 2 - title_text.get_width() // 2, H // 10))
 
+        players_text_1 = players_font.render('Первый игрок:', True, (255, 255, 255))
+        screen.blit(players_text_1, (W // 8, H // 4.6))
+
+        players_text_2 = players_font.render('Второй игрок:', True, (255, 255, 255))
+        screen.blit(players_text_2, (W // 8, H // 1.550))
 
         # отрисовка скинов для 1-го игрока (верхний ряд)
         screen.blit(green_surf, green_rect_1)
@@ -594,18 +605,6 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(orange_surf, orange_rect_1)
         screen.blit(blue_surf, blue_rect_1)
         screen.blit(red_surf, red_rect_1)
-
-        # подписи для первого игрока
-        screen.blit(small_font.render('Зеленый', True, (255, 255, 255)),
-                    (green_rect_1.centerx - 30, green_rect_1.bottom + 10))
-        screen.blit(small_font.render('Фиолетовый', True, (255, 255, 255)),
-                    (purple_rect_1.centerx - 40, purple_rect_1.bottom + 10))
-        screen.blit(small_font.render('Оранжевый', True, (255, 255, 255)),
-                    (orange_rect_1.centerx - 40, orange_rect_1.bottom + 10))
-        screen.blit(small_font.render('Синий', True, (255, 255, 255)),
-                    (blue_rect_1.centerx - 25, blue_rect_1.bottom + 10))
-        screen.blit(small_font.render('Красный', True, (255, 255, 255)),
-                    (red_rect_1.centerx - 30, red_rect_1.bottom + 10))
 
 
         # отрисовка скинов для 2-го игрока (нижний ряд)
@@ -615,20 +614,8 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(blue_surf, blue_rect_2)
         screen.blit(red_surf, red_rect_2)
 
-        # подписи для второго игрока
-        screen.blit(small_font.render('Зеленый', True, (255, 255, 255)),
-                    (green_rect_2.centerx - 30, green_rect_2.bottom + 10))
-        screen.blit(small_font.render('Фиолетовый', True, (255, 255, 255)),
-                    (purple_rect_2.centerx - 40, purple_rect_2.bottom + 10))
-        screen.blit(small_font.render('Оранжевый', True, (255, 255, 255)),
-                    (orange_rect_2.centerx - 40, orange_rect_2.bottom + 10))
-        screen.blit(small_font.render('Синий', True, (255, 255, 255)),
-                    (blue_rect_2.centerx - 25, blue_rect_2.bottom + 10))
-        screen.blit(small_font.render('Красный', True, (255, 255, 255)),
-                    (red_rect_2.centerx - 30, red_rect_2.bottom + 10))
-
         # инструкция
-        start_info = font.render('Нажмите любую клавишу для начала игры', True, (255, 255, 255))
+        start_info = font.render('Нажмите любую клавишу для продолжения...', True, (255, 255, 255))
         screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H - 100))
 
         pg.display.update()
@@ -643,28 +630,38 @@ def show_screen_for_choose_skins():  # функция для выбора ски
                 mouse_pos = event.pos
 
                 # проверка выбора для первого игрока (верхний ряд)
-                if green_rect_1.collidepoint(mouse_pos):
+                if green_rect_1.collidepoint(mouse_pos) and not green_flag:
                     player1_skin = 'images/green_tank.png'
-                elif purple_rect_1.collidepoint(mouse_pos):
+                    green_flag = True
+                elif purple_rect_1.collidepoint(mouse_pos) and not purple_flag:
                     player1_skin = 'images/purple_tank.png'
-                elif orange_rect_1.collidepoint(mouse_pos):
+                    purple_flag = True
+                elif orange_rect_1.collidepoint(mouse_pos) and not orange_flag:
                     player1_skin = 'images/orange_tank.png'
-                elif blue_rect_1.collidepoint(mouse_pos):
+                    orange_flag = True
+                elif blue_rect_1.collidepoint(mouse_pos) and not blue_flag:
                     player1_skin = 'images/blue_tank.png'
-                elif red_rect_1.collidepoint(mouse_pos):
+                    blue_flag = True
+                elif red_rect_1.collidepoint(mouse_pos) and not red_flag:
                     player1_skin = 'images/red_tank.png'
+                    red_flag = True
 
                 # проверка выбора для второго игрока (нижний ряд)
-                elif green_rect_2.collidepoint(mouse_pos):
+                elif green_rect_2.collidepoint(mouse_pos) and not green_flag:
                     player2_skin = 'images/green_tank.png'
-                elif purple_rect_2.collidepoint(mouse_pos):
+                    green_flag = True
+                elif purple_rect_2.collidepoint(mouse_pos) and not purple_flag:
                     player2_skin = 'images/purple_tank.png'
-                elif orange_rect_2.collidepoint(mouse_pos):
+                    purple_flag = True
+                elif orange_rect_2.collidepoint(mouse_pos) and not orange_flag:
                     player2_skin = 'images/orange_tank.png'
-                elif blue_rect_2.collidepoint(mouse_pos):
+                    orange_flag = True
+                elif blue_rect_2.collidepoint(mouse_pos) and not blue_flag:
                     player2_skin = 'images/blue_tank.png'
-                elif red_rect_2.collidepoint(mouse_pos):
+                    blue_flag = True
+                elif red_rect_2.collidepoint(mouse_pos) and not red_flag:
                     player2_skin = 'images/red_tank.png'
+                    red_flag = True
 
             if event.type == pg.KEYDOWN:
                 waiting_for_choose = False
