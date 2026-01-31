@@ -9,20 +9,16 @@ HEART_SIZE = 40
 MAX_LIVES = 3
 HEART_SPACING = 10
 waiting_for_choose = True
-red_tank = None
-blue_tank = None
-green_tank = None
-purple_tank = None
-orange_tank = None
+
 
 class Tank:
     def __init__(self, player1, player2):
         if player1 is None:
-            player1 = 'images/blue_tank.png'  # Значение по умолчанию для 1-го игрока
+            player1 = 'images/blue_tank.png'  # скин по умолчанию для 1-го игрока
         if player2 is None:
-            player2 = 'images/red_tank.png'  # Значение по умолчанию для 2-го игрока
+            player2 = 'images/red_tank.png'  # скин по умолчанию для 2-го игрока
 
-        # загрузка и масштабирование синего танка
+        # загрузка и масштабирование танка 1-го игрока
         self.surf_1 = pg.image.load(player1).convert_alpha()
         self.new_surf_1 = pg.transform.scale(self.surf_1,
                                              (self.surf_1.get_width() / 8,
@@ -32,7 +28,7 @@ class Tank:
         self.mask_1 = pg.mask.from_surface(self.surf_1)
         self.direction_1 = 0
 
-        # загрузка и масштабирование красного танка
+        # загрузка и масштабирование танка 2-го игрока
         self.surf_2 = pg.image.load(player2).convert_alpha()
         self.new_surf_2 = pg.transform.scale(self.surf_2,
                                              (self.surf_2.get_width() / 8,
@@ -143,7 +139,7 @@ class Tank:
 
         old_rect = self.rect_2.copy()
 
-        # Попытка движения
+        # попытка движения
         if (self.rect_2.left + dx * speed) > 0 and (self.rect_2.right + dx * speed) < W:
             self.rect_2.x += dx * speed
         if (self.rect_2.top + dy * speed) > 0 and (self.rect_2.bottom + dy * speed) < H:
@@ -200,6 +196,7 @@ class Bullet:
                                               (self.bullet_surf.get_width() / 16,
                                                self.bullet_surf.get_height() / 16))
 
+        # поворачиваем пулю в зависимости от того, как повернут танк
         if direction == 90:  # вправо
             self.bullet_surf = pg.transform.rotate(self.bullet_surf, -90)
         elif direction == 270:  # влево
@@ -390,7 +387,7 @@ class Tree:  # класс для куста. позволяет танку ст�
             (250 + self.tree_size, 518 + self.wood_size * 1.2),  # левые центральные кусты
             (518 + self.wood_size * 3.3, 160), (518 + self.wood_size * 1.7, 160), (518, 160)
         ]
-        self.cnt_trees = 10  # 16
+        self.cnt_trees = 10
         self.tree_rects = [pg.Rect(x, y, self.tree_size, self.tree_size)
                            for x, y in self.tree_positions[:self.cnt_trees]]
 
@@ -433,11 +430,11 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
     bet_box = bet_boxes[0]
 
     # обрабатываем синие пули
-    for bul_blue in bullets_blue[:]:  # используем копию списка для безопасного удаления
+    for bul_blue in bullets_blue[:]:  # копия списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
-        for w_rect in wood_box.wood_rects[:]:  # используем копию для безопасного удаления
+        for w_rect in wood_box.wood_rects[:]:  # копия для безопасного удаления
             if bul_blue.bullet_rect.colliderect(w_rect):
                 offset = (w_rect.left - bul_blue.bullet_rect.left,
                           w_rect.top - bul_blue.bullet_rect.top)
@@ -466,11 +463,11 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
             bul_blue.flag_active = False
 
     # обрабатываем красные пули
-    for bul_red in bullets_red[:]:  # используем копию списка для безопасного удаления
+    for bul_red in bullets_red[:]:  # копия списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
-        for w_rect in wood_box.wood_rects[:]:  # используем копию для безопасного удаления
+        for w_rect in wood_box.wood_rects[:]:  # копия для безопасного удаления
             if bul_red.bullet_rect.colliderect(w_rect):
                 offset = (w_rect.left - bul_red.bullet_rect.left,
                           w_rect.top - bul_red.bullet_rect.top)
@@ -548,6 +545,12 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     purple_flag = False
     orange_flag = False
 
+    # рамка
+    blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
+    blue_frame_surf = pg.transform.scale(blue_frame_surf,
+                                         (blue_frame_surf.get_width() / 7, blue_frame_surf.get_height() / 6))
+    blue_frame_rect = blue_frame_surf.get_rect(center=(W / 12, H / 3))
+
     # загружаем и масштабируем изображения танков
     green_surf = pg.image.load('images/green_tank.png').convert_alpha()
     green_surf = pg.transform.scale(green_surf, (green_surf.get_width() / 8, green_surf.get_height() / 8))
@@ -597,7 +600,7 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(players_text_1, (W // 8, H // 4.6))
 
         players_text_2 = players_font.render('Второй игрок:', True, (255, 255, 255))
-        screen.blit(players_text_2, (W // 8, H // 1.550))
+        screen.blit(players_text_2, (W // 8, H // 1.55))
 
         # отрисовка скинов для 1-го игрока (верхний ряд)
         screen.blit(green_surf, green_rect_1)
@@ -605,7 +608,6 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(orange_surf, orange_rect_1)
         screen.blit(blue_surf, blue_rect_1)
         screen.blit(red_surf, red_rect_1)
-
 
         # отрисовка скинов для 2-го игрока (нижний ряд)
         screen.blit(green_surf, green_rect_2)
@@ -633,6 +635,8 @@ def show_screen_for_choose_skins():  # функция для выбора ски
                 if green_rect_1.collidepoint(mouse_pos) and not green_flag:
                     player1_skin = 'images/green_tank.png'
                     green_flag = True
+                    screen.blit(blue_frame_surf, blue_frame_rect)
+                    pg.display.update()
                 elif purple_rect_1.collidepoint(mouse_pos) and not purple_flag:
                     player1_skin = 'images/purple_tank.png'
                     purple_flag = True
@@ -662,6 +666,7 @@ def show_screen_for_choose_skins():  # функция для выбора ски
                 elif red_rect_2.collidepoint(mouse_pos) and not red_flag:
                     player2_skin = 'images/red_tank.png'
                     red_flag = True
+
 
             if event.type == pg.KEYDOWN:
                 waiting_for_choose = False
@@ -701,7 +706,6 @@ trees = [Tree()]
 bullets_blue = []
 bullets_red = []
 
-
 game_over = False
 winner = ''
 flag_play = True
@@ -725,7 +729,6 @@ def reset_game():
     winner = ""
 
 
-
 while flag_play:
     clock.tick(FPS)
 
@@ -743,6 +746,7 @@ while flag_play:
     if not game_over:
         keys = pg.key.get_pressed()
 
+        # прописываем движение и выстрел для 1-го игрока
         if keys[pg.K_a]:
             tank.rect_1 = tank.flip2_blue()
             tank.move_1(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
@@ -759,8 +763,9 @@ while flag_play:
         if keys[pg.K_SPACE] and tank.can_shoot():
             tank.shoot()
             bullets_blue.append(Bullet(tank.rect_1, tank.direction_1, 1))
-            shot.play()
+            shot.play()  # проигрываем звук выстрела
 
+        # прописываем движение и выстрел для 2-го игрока
         if keys[pg.K_LEFT]:
             tank.rect_2 = tank.flip2_red()
             tank.move_2(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
@@ -777,7 +782,7 @@ while flag_play:
         if keys[pg.K_KP_ENTER] and tank.can_shoot():
             tank.shoot()
             bullets_red.append(Bullet(tank.rect_2, tank.direction_2, 2))
-            shot.play()
+            shot.play()  # проигрываем звук выстрела
 
         # проверка столкновений пуль с танками
         collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts)
@@ -793,10 +798,12 @@ while flag_play:
     for b_box in bet_boxes:
         b_box.draw_bet_boxes(screen)
 
+    # отрисовка сердец и танков
     blue_hearts.draw(screen)
     red_hearts.draw(screen)
     tank.draw(screen)
 
+    # отрисовываем все пули
     for bullet in bullets_blue:
         bullet.fly()
         bullet.draw(screen)
@@ -805,6 +812,7 @@ while flag_play:
         bullet.fly()
         bullet.draw(screen)
 
+    # отрисовка кустов
     for tree in trees:
         tree.draw_trees(screen)
 
