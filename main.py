@@ -539,11 +539,8 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     player1_skin = 'images/blue_tank.png'  # скин по умолчанию для 1-го игрока
     player2_skin = 'images/red_tank.png'  # скин по умолчанию для 2-го игрока
 
-    green_flag = False
-    red_flag = False
-    blue_flag = False
-    purple_flag = False
-    orange_flag = False
+    selected_tank1_rect = None
+    selected_tank2_rect = None
 
     # рамка
     blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
@@ -581,6 +578,10 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     blue_rect_2 = blue_surf.get_rect(center=(W / 2.1, H * 3 / 4))
     red_rect_2 = red_surf.get_rect(center=(W / 1.65, H * 3 / 4))
 
+    blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
+    blue_frame_surf = pg.transform.scale(blue_frame_surf,
+                                         (blue_frame_surf.get_width() / 7, blue_frame_surf.get_height() / 6))
+
     font = pg.font.Font(None, 45)
     players_font = pg.font.Font(None, 45)
 
@@ -616,6 +617,14 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(blue_surf, blue_rect_2)
         screen.blit(red_surf, red_rect_2)
 
+        if selected_tank1_rect:
+            frame_rect = blue_frame_surf.get_rect(center=selected_tank1_rect.center)
+            screen.blit(blue_frame_surf, frame_rect)
+
+        if selected_tank2_rect:
+            frame_rect = blue_frame_surf.get_rect(center=selected_tank2_rect.center)
+            screen.blit(blue_frame_surf, frame_rect)
+
         # инструкция
         start_info = font.render('Нажмите любую клавишу для продолжения...', True, (255, 255, 255))
         screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H - 100))
@@ -632,41 +641,48 @@ def show_screen_for_choose_skins():  # функция для выбора ски
                 mouse_pos = event.pos
 
                 # проверка выбора для первого игрока (верхний ряд)
-                if green_rect_1.collidepoint(mouse_pos) and not green_flag:
-                    player1_skin = 'images/green_tank.png'
-                    green_flag = True
-                    screen.blit(blue_frame_surf, blue_frame_rect)
-                    pg.display.update()
-                elif purple_rect_1.collidepoint(mouse_pos) and not purple_flag:
-                    player1_skin = 'images/purple_tank.png'
-                    purple_flag = True
-                elif orange_rect_1.collidepoint(mouse_pos) and not orange_flag:
-                    player1_skin = 'images/orange_tank.png'
-                    orange_flag = True
-                elif blue_rect_1.collidepoint(mouse_pos) and not blue_flag:
-                    player1_skin = 'images/blue_tank.png'
-                    blue_flag = True
-                elif red_rect_1.collidepoint(mouse_pos) and not red_flag:
-                    player1_skin = 'images/red_tank.png'
-                    red_flag = True
+                if green_rect_1.collidepoint(mouse_pos):
+                    if player2_skin != 'images/green_tank.png':  # проверяем, не выбран ли уже этот танк вторым игроком
+                        player1_skin = 'images/green_tank.png'
+                        selected_tank1_rect = green_rect_1
+                elif purple_rect_1.collidepoint(mouse_pos):
+                    if player2_skin != 'images/purple_tank.png':
+                        player1_skin = 'images/purple_tank.png'
+                        selected_tank1_rect = purple_rect_1
+                elif orange_rect_1.collidepoint(mouse_pos):
+                    if player2_skin != 'images/orange_tank.png':
+                        player1_skin = 'images/orange_tank.png'
+                        selected_tank1_rect = orange_rect_1
+                elif blue_rect_1.collidepoint(mouse_pos):
+                    if player2_skin != 'images/blue_tank.png':
+                        player1_skin = 'images/blue_tank.png'
+                        selected_tank1_rect = blue_rect_1
+                elif red_rect_1.collidepoint(mouse_pos):
+                    if player2_skin != 'images/red_tank.png':
+                        player1_skin = 'images/red_tank.png'
+                        selected_tank1_rect = red_rect_1
 
                 # проверка выбора для второго игрока (нижний ряд)
-                elif green_rect_2.collidepoint(mouse_pos) and not green_flag:
-                    player2_skin = 'images/green_tank.png'
-                    green_flag = True
-                elif purple_rect_2.collidepoint(mouse_pos) and not purple_flag:
-                    player2_skin = 'images/purple_tank.png'
-                    purple_flag = True
-                elif orange_rect_2.collidepoint(mouse_pos) and not orange_flag:
-                    player2_skin = 'images/orange_tank.png'
-                    orange_flag = True
-                elif blue_rect_2.collidepoint(mouse_pos) and not blue_flag:
-                    player2_skin = 'images/blue_tank.png'
-                    blue_flag = True
-                elif red_rect_2.collidepoint(mouse_pos) and not red_flag:
-                    player2_skin = 'images/red_tank.png'
-                    red_flag = True
-
+                elif green_rect_2.collidepoint(mouse_pos):
+                    if player1_skin != 'images/green_tank.png':  # проверяем, не выбран ли уже этот танк первым игроком
+                        player2_skin = 'images/green_tank.png'
+                        selected_tank2_rect = green_rect_2
+                elif purple_rect_2.collidepoint(mouse_pos):
+                    if player1_skin != 'images/purple_tank.png':
+                        player2_skin = 'images/purple_tank.png'
+                        selected_tank2_rect = purple_rect_2
+                elif orange_rect_2.collidepoint(mouse_pos):
+                    if player1_skin != 'images/orange_tank.png':
+                        player2_skin = 'images/orange_tank.png'
+                        selected_tank2_rect = orange_rect_2
+                elif blue_rect_2.collidepoint(mouse_pos):
+                    if player1_skin != 'images/blue_tank.png':
+                        player2_skin = 'images/blue_tank.png'
+                        selected_tank2_rect = blue_rect_2
+                elif red_rect_2.collidepoint(mouse_pos):
+                    if player1_skin != 'images/red_tank.png':
+                        player2_skin = 'images/red_tank.png'
+                        selected_tank2_rect = red_rect_2
 
             if event.type == pg.KEYDOWN:
                 waiting_for_choose = False
