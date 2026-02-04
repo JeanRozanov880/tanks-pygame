@@ -510,13 +510,17 @@ def show_start_screen():
         screen.blit(title_text, (W // 2 - title_text.get_width() // 2, H // 4))
 
         font = pg.font.Font(None, 45)
-        start_text_blue = font.render('Управление для первого игрока: WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
-        start_text_red = font.render('Управление для второго игрока: стрелки, стрельба - правый Enter', True,
-                                     (255, 100, 100))
+        start_text_blue_1 = font.render('Управление для первого игрока:', True, (100, 200, 255))
+        start_text_blue_2 = font.render('WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
+        start_text_red_1 = font.render('Управление для второго игрока:', True,(255, 100, 100))
+        start_text_red_2 = font.render('стрелки, стрельба - правый CTRL', True,(255, 100, 100))
 
-        # позиционируем текст
-        screen.blit(start_text_blue, (W // 2 - start_text_blue.get_width() // 2, H // 2))
-        screen.blit(start_text_red, (W // 2 - start_text_red.get_width() // 2, H // 2 + 40))
+
+    # позиционируем текст
+        screen.blit(start_text_blue_1, (W // 3.8 - start_text_blue_1.get_width() // 2, H // 2.6))
+        screen.blit(start_text_blue_2, (W // 4 - start_text_blue_2.get_width() // 2, H // 2.3))
+        screen.blit(start_text_red_1, (W // 1.4 - start_text_red_1.get_width() // 2, H // 1.87))
+        screen.blit(start_text_red_2, (W // 1.4 - start_text_red_2.get_width() // 2, H // 1.7))
 
         start_info = font.render('Нажмите любую клавишу для начала игры', True, (255, 255, 255))
         screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H * 3 // 4))
@@ -565,18 +569,18 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     red_surf = pg.transform.scale(red_surf, (red_surf.get_width() / 8, red_surf.get_height() / 8))
 
     # создаем прямоугольники для первого игрока (верхний ряд)
-    green_rect_1 = green_surf.get_rect(center=(W / 12, H / 3))
-    purple_rect_1 = purple_surf.get_rect(center=(W / 4.8, H / 3))
-    orange_rect_1 = orange_surf.get_rect(center=(W / 2.9, H / 3))
-    blue_rect_1 = blue_surf.get_rect(center=(W / 2.1, H / 3))
-    red_rect_1 = red_surf.get_rect(center=(W / 1.65, H / 3))
+    green_rect_1 = green_surf.get_rect(center=(W / 4.7, H / 3))
+    purple_rect_1 = purple_surf.get_rect(center=(W / 2.87, H / 3))
+    orange_rect_1 = orange_surf.get_rect(center=(W / 2.07, H / 3))
+    blue_rect_1 = blue_surf.get_rect(center=(W / 1.6, H / 3))
+    red_rect_1 = red_surf.get_rect(center=(W / 1.3, H / 3))
 
     # создаем прямоугольники для второго игрока (нижний ряд)
-    green_rect_2 = green_surf.get_rect(center=(W / 12, H * 3 / 4))
-    purple_rect_2 = purple_surf.get_rect(center=(W / 4.8, H * 3 / 4))
-    orange_rect_2 = orange_surf.get_rect(center=(W / 2.9, H * 3 / 4))
-    blue_rect_2 = blue_surf.get_rect(center=(W / 2.1, H * 3 / 4))
-    red_rect_2 = red_surf.get_rect(center=(W / 1.65, H * 3 / 4))
+    green_rect_2 = green_surf.get_rect(center=(W / 4.7, H * 3 / 4))
+    purple_rect_2 = purple_surf.get_rect(center=(W / 2.87, H * 3 / 4))
+    orange_rect_2 = orange_surf.get_rect(center=(W / 2.07, H * 3 / 4))
+    blue_rect_2 = blue_surf.get_rect(center=(W / 1.6, H * 3 / 4))
+    red_rect_2 = red_surf.get_rect(center=(W / 1.3, H * 3 / 4))
 
     blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
     blue_frame_surf = pg.transform.scale(blue_frame_surf,
@@ -598,10 +602,10 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(title_text, (W // 2 - title_text.get_width() // 2, H // 10))
 
         players_text_1 = players_font.render('Первый игрок:', True, (255, 255, 255))
-        screen.blit(players_text_1, (W // 8, H // 4.6))
+        screen.blit(players_text_1, (W // 2.9, H // 4.6))
 
         players_text_2 = players_font.render('Второй игрок:', True, (255, 255, 255))
-        screen.blit(players_text_2, (W // 8, H // 1.55))
+        screen.blit(players_text_2, (W // 2.9, H // 1.55))
 
         # отрисовка скинов для 1-го игрока (верхний ряд)
         screen.blit(green_surf, green_rect_1)
@@ -795,7 +799,7 @@ while flag_play:
             tank.rect_2 = tank.flip4_red()
             tank.move_2(dy=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
 
-        if keys[pg.K_KP_ENTER] and tank.can_shoot():
+        if keys[pg.K_RCTRL] and tank.can_shoot():
             tank.shoot()
             bullets_red.append(Bullet(tank.rect_2, tank.direction_2, 2))
             shot.play()  # проигрываем звук выстрела
