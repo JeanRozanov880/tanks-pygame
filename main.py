@@ -1,5 +1,6 @@
 import pygame as pg
 
+
 FPS = 60
 W, H = 1000, 1000
 BG = (100, 170, 220)
@@ -39,56 +40,56 @@ class Tank:
         self.direction_2 = 0
         self.cnt_iters = 0
 
-    def flip1_blue(self):
+    def flip1_player1(self):
         self.new_surf_1 = pg.transform.rotate(self.surf_1, -90)  # вправо
         self.mask_1 = pg.mask.from_surface(self.new_surf_1)
         self.direction_1 = 90
         current_rect_1 = self.new_surf_1.get_rect(center=self.rect_1.center)
         return current_rect_1
 
-    def flip2_blue(self):
+    def flip2_player1(self):
         self.new_surf_1 = pg.transform.rotate(self.surf_1, 90)  # влево
         self.mask_1 = pg.mask.from_surface(self.new_surf_1)
         self.direction_1 = 270
         current_rect_1 = self.new_surf_1.get_rect(center=self.rect_1.center)
         return current_rect_1
 
-    def flip3_blue(self):
+    def flip3_player1(self):
         self.new_surf_1 = pg.transform.rotate(self.surf_1, 0)  # вверх
         self.mask_1 = pg.mask.from_surface(self.new_surf_1)
         self.direction_1 = 0
         current_rect_1 = self.new_surf_1.get_rect(center=self.rect_1.center)
         return current_rect_1
 
-    def flip4_blue(self):
+    def flip4_player1(self):
         self.new_surf_1 = pg.transform.rotate(self.surf_1, 180)  # вниз
         self.mask_1 = pg.mask.from_surface(self.new_surf_1)
         self.direction_1 = 180
         current_rect_1 = self.new_surf_1.get_rect(center=self.rect_1.center)
         return current_rect_1
 
-    def flip1_red(self):
+    def flip1_player2(self):
         self.new_surf_2 = pg.transform.rotate(self.surf_2, -90)  # вправо
         self.mask_2 = pg.mask.from_surface(self.new_surf_2)
         self.direction_2 = 90
         current_rect_2 = self.new_surf_2.get_rect(center=self.rect_2.center)
         return current_rect_2
 
-    def flip2_red(self):
+    def flip2_player2(self):
         self.new_surf_2 = pg.transform.rotate(self.surf_2, 90)  # влево
         self.mask_2 = pg.mask.from_surface(self.new_surf_2)
         self.direction_2 = 270
         current_rect_2 = self.new_surf_2.get_rect(center=self.rect_2.center)
         return current_rect_2
 
-    def flip3_red(self):
+    def flip3_player2(self):
         self.new_surf_2 = pg.transform.rotate(self.surf_2, 0)  # вверх
         self.mask_2 = pg.mask.from_surface(self.new_surf_2)
         self.direction_2 = 0
         current_rect_2 = self.new_surf_2.get_rect(center=self.rect_2.center)
         return current_rect_2
 
-    def flip4_red(self):
+    def flip4_player2(self):
         self.new_surf_2 = pg.transform.rotate(self.surf_2, 180)  # вниз
         self.mask_2 = pg.mask.from_surface(self.new_surf_2)
         self.direction_2 = 180
@@ -204,7 +205,7 @@ class Bullet:
         elif direction == 180:  # вниз
             self.bullet_surf = pg.transform.rotate(self.bullet_surf, 180)
 
-        if tank_type == 1:  # синий танк
+        if tank_type == 1:  # первый игрок
             if direction == 0:  # вверх
                 self.bullet_rect = self.bullet_surf.get_rect(center=(tank_rect.centerx, tank_rect.top))
             elif direction == 90:  # вправо
@@ -213,7 +214,7 @@ class Bullet:
                 self.bullet_rect = self.bullet_surf.get_rect(center=(tank_rect.centerx, tank_rect.bottom))
             elif direction == 270:  # влево
                 self.bullet_rect = self.bullet_surf.get_rect(center=(tank_rect.left, tank_rect.centery))
-        else:  # красный танк
+        else:  # второй игрок
             if direction == 0:  # вверх
                 self.bullet_rect = self.bullet_surf.get_rect(center=(tank_rect.centerx, tank_rect.top))
             elif direction == 90:  # вправо
@@ -255,14 +256,14 @@ class Bullet:
 
 
 class HeartsDisplay:
-    def __init__(self, tank_type="blue"):
+    def __init__(self, tank_type="player1"):
         self.heart_image = pg.image.load('images/heart.png').convert_alpha()
         self.heart_image = pg.transform.scale(self.heart_image, (HEART_SIZE, HEART_SIZE))
 
         self.tank_type = tank_type
         self.lives = MAX_LIVES
 
-        if tank_type == "blue":
+        if tank_type == "player1":
             self.start_x = HEART_SPACING
         else:
             total_width = MAX_LIVES * HEART_SIZE + (MAX_LIVES - 1) * HEART_SPACING
@@ -396,49 +397,49 @@ class Tree:  # класс для куста. позволяет танку ст�
             screen.blit(self.tree_surf, rect)
 
 
-def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts):
-    # обработка синих пуль (выстрелы синего танка)
-    for bul_blue in bullets_blue[:]:  # копия списка
-        offset_1 = (bul_blue.bullet_rect.x - tank.rect_2.x, bul_blue.bullet_rect.y - tank.rect_2.y)
+def collisions_bullets_with_tanks(tank, bullets_player1, bullets_player2, player1_hearts, player2_hearts):
+    # обработка пуль первого игрока (выстрелы первого танка)
+    for bul_player1 in bullets_player1[:]:  # копия списка
+        offset_1 = (bul_player1.bullet_rect.x - tank.rect_2.x, bul_player1.bullet_rect.y - tank.rect_2.y)
 
-        if tank.mask_2.overlap(bul_blue.mask, offset_1) is not None:
-            # попадание синей пули в красный танк
-            red_hearts.lose_life()
-            bul_blue.flag_active = False  # деактивируем пулю после попадания
-            bullets_blue.remove(bul_blue)  # удаляем пулю из списка
+        if tank.mask_2.overlap(bul_player1.mask, offset_1) is not None:
+            # попадание пули первого игрока в танк второго игрока
+            player2_hearts.lose_life()
+            bul_player1.flag_active = False  # деактивируем пулю после попадания
+            bullets_player1.remove(bul_player1)  # удаляем пулю из списка
             tank_explode.play()
             return True  # возвращаем тру, чтобы показать, что было попадание
 
-    # обработка красных пуль (выстрелы красного танка)
-    for bul_red in bullets_red[:]:  # копия списка
-        offset_2 = (bul_red.bullet_rect.x - tank.rect_1.x, bul_red.bullet_rect.y - tank.rect_1.y)
+    # обработка пуль второго игрока (выстрелы второго танка)
+    for bul_player2 in bullets_player2[:]:  # копия списка
+        offset_2 = (bul_player2.bullet_rect.x - tank.rect_1.x, bul_player2.bullet_rect.y - tank.rect_1.y)
 
-        if tank.mask_1.overlap(bul_red.mask, offset_2) is not None:
-            # попадание красной пули в синий танк
-            blue_hearts.lose_life()
-            bul_red.flag_active = False  # деактивируем пулю после попадания
-            bullets_red.remove(bul_red)  # удаляем пулю из списка
+        if tank.mask_1.overlap(bul_player2.mask, offset_2) is not None:
+            # попадание пули второго игрока в танк первого игрока
+            player1_hearts.lose_life()
+            bul_player2.flag_active = False  # деактивируем пулю после попадания
+            bullets_player2.remove(bul_player2)  # удаляем пулю из списка
             tank_explode.play()
             return True  # возвращаем тру, чтобы показать, что было попадание
 
     return False
 
 
-def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_boxes):
+def collisions_bullets_with_blocks(bullets_player1, bullets_player2, wood_boxes, metal_boxes):
     # wood_boxes и metal_boxes - это списки объектов, берем первый (и единственный) элемент
     wood_box = wood_boxes[0]
     metal_box = metal_boxes[0]
 
-    # обрабатываем синие пули
-    for bul_blue in bullets_blue[:]:  # копия списка для безопасного удаления
+    # обрабатываем пули первого игрока
+    for bul_player1 in bullets_player1[:]:  # копия списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
         for w_rect in wood_box.wood_rects[:]:  # копия для безопасного удаления
-            if bul_blue.bullet_rect.colliderect(w_rect):
-                offset = (w_rect.left - bul_blue.bullet_rect.left,
-                          w_rect.top - bul_blue.bullet_rect.top)
-                if wood_box.wood_mask.overlap(bul_blue.mask, offset):
+            if bul_player1.bullet_rect.colliderect(w_rect):
+                offset = (w_rect.left - bul_player1.bullet_rect.left,
+                          w_rect.top - bul_player1.bullet_rect.top)
+                if wood_box.wood_mask.overlap(bul_player1.mask, offset):
                     bullet_hit = True
                     # удаляем деревянную коробку при попадании
                     if w_rect in wood_box.wood_rects:
@@ -450,28 +451,28 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_
         # проверяем столкновение с металлическими коробками (не удаляем их)
         if not bullet_hit:
             for m_rect in metal_box.metal_rects:
-                if bul_blue.bullet_rect.colliderect(m_rect):
-                    offset = (m_rect.left - bul_blue.bullet_rect.left,
-                              m_rect.top - bul_blue.bullet_rect.top)
-                    if metal_box.metal_mask.overlap(bul_blue.mask, offset):
+                if bul_player1.bullet_rect.colliderect(m_rect):
+                    offset = (m_rect.left - bul_player1.bullet_rect.left,
+                              m_rect.top - bul_player1.bullet_rect.top)
+                    if metal_box.metal_mask.overlap(bul_player1.mask, offset):
                         bullet_hit = True
                         metal_strike.play()
                         break
 
         # если пуля попала в коробку, деактивируем ее
         if bullet_hit:
-            bul_blue.flag_active = False
+            bul_player1.flag_active = False
 
-    # обрабатываем красные пули
-    for bul_red in bullets_red[:]:  # копия списка для безопасного удаления
+    # обрабатываем пули второго игрока
+    for bul_player2 in bullets_player2[:]:  # копия списка для безопасного удаления
         bullet_hit = False
 
         # проверяем столкновение с деревянными коробками
         for w_rect in wood_box.wood_rects[:]:  # копия для безопасного удаления
-            if bul_red.bullet_rect.colliderect(w_rect):
-                offset = (w_rect.left - bul_red.bullet_rect.left,
-                          w_rect.top - bul_red.bullet_rect.top)
-                if wood_box.wood_mask.overlap(bul_red.mask, offset):
+            if bul_player2.bullet_rect.colliderect(w_rect):
+                offset = (w_rect.left - bul_player2.bullet_rect.left,
+                          w_rect.top - bul_player2.bullet_rect.top)
+                if wood_box.wood_mask.overlap(bul_player2.mask, offset):
                     bullet_hit = True
                     # удаляем деревянную коробку при попадании
                     if w_rect in wood_box.wood_rects:
@@ -483,17 +484,17 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_
         # проверяем столкновение с металлическими коробки (не удаляем их)
         if not bullet_hit:
             for m_rect in metal_box.metal_rects:
-                if bul_red.bullet_rect.colliderect(m_rect):
-                    offset = (m_rect.left - bul_red.bullet_rect.left,
-                              m_rect.top - bul_red.bullet_rect.top)
-                    if metal_box.metal_mask.overlap(bul_red.mask, offset):
+                if bul_player2.bullet_rect.colliderect(m_rect):
+                    offset = (m_rect.left - bul_player2.bullet_rect.left,
+                              m_rect.top - bul_player2.bullet_rect.top)
+                    if metal_box.metal_mask.overlap(bul_player2.mask, offset):
                         bullet_hit = True
                         metal_strike.play()
                         break
 
         # если пуля попала в коробку, деактивируем ее
         if bullet_hit:
-            bul_red.flag_active = False
+            bul_player2.flag_active = False
 
 
 def show_start_screen():
@@ -510,17 +511,16 @@ def show_start_screen():
         screen.blit(title_text, (W // 2 - title_text.get_width() // 2, H // 4))
 
         font = pg.font.Font(None, 45)
-        start_text_blue_1 = font.render('Управление для первого игрока:', True, (100, 200, 255))
-        start_text_blue_2 = font.render('WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
-        start_text_red_1 = font.render('Управление для второго игрока:', True,(255, 100, 100))
-        start_text_red_2 = font.render('стрелки, стрельба - правый CTRL', True,(255, 100, 100))
+        start_text_player1_1 = font.render('Управление для первого игрока:', True, (100, 200, 255))
+        start_text_player1_2 = font.render('WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
+        start_text_player2_1 = font.render('Управление для второго игрока:', True,(255, 100, 100))
+        start_text_player2_2 = font.render('стрелки, стрельба - правый CTRL', True,(255, 100, 100))
 
-
-    # позиционируем текст
-        screen.blit(start_text_blue_1, (W // 3.8 - start_text_blue_1.get_width() // 2, H // 2.6))
-        screen.blit(start_text_blue_2, (W // 4 - start_text_blue_2.get_width() // 2, H // 2.3))
-        screen.blit(start_text_red_1, (W // 1.4 - start_text_red_1.get_width() // 2, H // 1.87))
-        screen.blit(start_text_red_2, (W // 1.4 - start_text_red_2.get_width() // 2, H // 1.7))
+        # позиционируем текст
+        screen.blit(start_text_player1_1, (W // 3.8 - start_text_player1_1.get_width() // 2, H // 2.6))
+        screen.blit(start_text_player1_2, (W // 4 - start_text_player1_2.get_width() // 2, H // 2.3))
+        screen.blit(start_text_player2_1, (W // 1.4 - start_text_player2_1.get_width() // 2, H // 1.87))
+        screen.blit(start_text_player2_2, (W // 1.4 - start_text_player2_2.get_width() // 2, H // 1.7))
 
         start_info = font.render('Нажмите любую клавишу для начала игры', True, (255, 255, 255))
         screen.blit(start_info, (W // 2 - start_info.get_width() // 2, H * 3 // 4))
@@ -547,10 +547,10 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     selected_tank2_rect = None
 
     # рамка
-    blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
-    blue_frame_surf = pg.transform.scale(blue_frame_surf,
-                                         (blue_frame_surf.get_width() / 7, blue_frame_surf.get_height() / 6))
-    blue_frame_rect = blue_frame_surf.get_rect(center=(W / 12, H / 3))
+    frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
+    frame_surf = pg.transform.scale(frame_surf,
+                                         (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
+    player1_frame_rect = frame_surf.get_rect(center=(W / 12, H / 3))
 
     # загружаем и масштабируем изображения танков
     green_surf = pg.image.load('images/green_tank.png').convert_alpha()
@@ -582,9 +582,9 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     blue_rect_2 = blue_surf.get_rect(center=(W / 1.6, H * 3 / 4))
     red_rect_2 = red_surf.get_rect(center=(W / 1.3, H * 3 / 4))
 
-    blue_frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
-    blue_frame_surf = pg.transform.scale(blue_frame_surf,
-                                         (blue_frame_surf.get_width() / 7, blue_frame_surf.get_height() / 6))
+    frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
+    frame_surf = pg.transform.scale(frame_surf,
+                                         (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
 
     font = pg.font.Font(None, 45)
     players_font = pg.font.Font(None, 45)
@@ -622,12 +622,12 @@ def show_screen_for_choose_skins():  # функция для выбора ски
         screen.blit(red_surf, red_rect_2)
 
         if selected_tank1_rect:
-            frame_rect = blue_frame_surf.get_rect(center=selected_tank1_rect.center)
-            screen.blit(blue_frame_surf, frame_rect)
+            frame_rect = frame_surf.get_rect(center=selected_tank1_rect.center)
+            screen.blit(frame_surf, frame_rect)
 
         if selected_tank2_rect:
-            frame_rect = blue_frame_surf.get_rect(center=selected_tank2_rect.center)
-            screen.blit(blue_frame_surf, frame_rect)
+            frame_rect = frame_surf.get_rect(center=selected_tank2_rect.center)
+            screen.blit(frame_surf, frame_rect)
 
         # инструкция
         start_info = font.render('Нажмите любую клавишу для продолжения...', True, (255, 255, 255))
@@ -716,15 +716,15 @@ show_screen_for_choose_skins()
 if not waiting_for_choose:
     show_start_screen()
 
-blue_hearts = HeartsDisplay("blue")
-red_hearts = HeartsDisplay("red")
+player1_hearts = HeartsDisplay("player1")
+player2_hearts = HeartsDisplay("player2")
 
 wood_boxes = [WoodBoxes()]
 metal_boxes = [MetalBoxes()]
 trees = [Tree()]
 
-bullets_blue = []
-bullets_red = []
+bullets_player1 = []
+bullets_player2 = []
 
 game_over = False
 winner = ''
@@ -733,18 +733,18 @@ flag_play = True
 
 def reset_game():
     """Сброс игры до начального состояния"""
-    global tank, blue_hearts, red_hearts, wood_boxes, metal_boxes, bullets_blue, bullets_red, game_over, winner
+    global tank, player1_hearts, player2_hearts, wood_boxes, metal_boxes, bullets_player1, bullets_player2, game_over, winner
 
     tank = Tank(player1_skin, player2_skin)
-    blue_hearts.reset()
-    red_hearts.reset()
+    player1_hearts.reset()
+    player2_hearts.reset()
 
     # создаем новые объекты коробок вместо очистки списков
     wood_boxes = [WoodBoxes()]
     metal_boxes = [MetalBoxes()]
 
-    bullets_blue.clear()
-    bullets_red.clear()
+    bullets_player1.clear()
+    bullets_player2.clear()
     game_over = False
     winner = ""
 
@@ -768,47 +768,47 @@ while flag_play:
 
         # прописываем движение и выстрел для 1-го игрока
         if keys[pg.K_a]:
-            tank.rect_1 = tank.flip2_blue()
+            tank.rect_1 = tank.flip2_player1()
             tank.move_1(dx=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_d]:
-            tank.rect_1 = tank.flip1_blue()
+            tank.rect_1 = tank.flip1_player1()
             tank.move_1(dx=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_w]:
-            tank.rect_1 = tank.flip3_blue()
+            tank.rect_1 = tank.flip3_player1()
             tank.move_1(dy=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_s]:
-            tank.rect_1 = tank.flip4_blue()
+            tank.rect_1 = tank.flip4_player1()
             tank.move_1(dy=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
 
         if keys[pg.K_SPACE] and tank.can_shoot():
             tank.shoot()
-            bullets_blue.append(Bullet(tank.rect_1, tank.direction_1, 1))
+            bullets_player1.append(Bullet(tank.rect_1, tank.direction_1, 1))
             shot.play()  # проигрываем звук выстрела
 
         # прописываем движение и выстрел для 2-го игрока
         if keys[pg.K_LEFT]:
-            tank.rect_2 = tank.flip2_red()
+            tank.rect_2 = tank.flip2_player2()
             tank.move_2(dx=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_RIGHT]:
-            tank.rect_2 = tank.flip1_red()
+            tank.rect_2 = tank.flip1_player2()
             tank.move_2(dx=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_UP]:
-            tank.rect_2 = tank.flip3_red()
+            tank.rect_2 = tank.flip3_player2()
             tank.move_2(dy=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_DOWN]:
-            tank.rect_2 = tank.flip4_red()
+            tank.rect_2 = tank.flip4_player2()
             tank.move_2(dy=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
 
         if keys[pg.K_RCTRL] and tank.can_shoot():
             tank.shoot()
-            bullets_red.append(Bullet(tank.rect_2, tank.direction_2, 2))
+            bullets_player2.append(Bullet(tank.rect_2, tank.direction_2, 2))
             shot.play()  # проигрываем звук выстрела
 
         # проверка столкновений пуль с танками
-        collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts)
+        collisions_bullets_with_tanks(tank, bullets_player1, bullets_player2, player1_hearts, player2_hearts)
 
         # проверка столкновений пуль с блоками
-        collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_boxes)
+        collisions_bullets_with_blocks(bullets_player1, bullets_player2, wood_boxes, metal_boxes)
 
     screen.blit(background_image, (0, 0))
 
@@ -819,16 +819,16 @@ while flag_play:
         m_box.draw_metal_boxes(screen)
 
     # отрисовка сердец и танков
-    blue_hearts.draw(screen)
-    red_hearts.draw(screen)
+    player1_hearts.draw(screen)
+    player2_hearts.draw(screen)
     tank.draw(screen)
 
     # отрисовываем все пули
-    for bullet in bullets_blue:
+    for bullet in bullets_player1:
         bullet.fly()
         bullet.draw(screen)
 
-    for bullet in bullets_red:
+    for bullet in bullets_player2:
         bullet.fly()
         bullet.draw(screen)
 
@@ -836,14 +836,14 @@ while flag_play:
     for tree in trees:
         tree.draw_trees(screen)
 
-    bullets_blue = [bullet for bullet in bullets_blue if bullet.is_active()]
-    bullets_red = [bullet for bullet in bullets_red if bullet.is_active()]
+    bullets_player1 = [bullet for bullet in bullets_player1 if bullet.is_active()]
+    bullets_player2 = [bullet for bullet in bullets_player2 if bullet.is_active()]
 
     if not game_over:
-        if not blue_hearts.is_alive():
+        if not player1_hearts.is_alive():
             game_over = True
             winner = "Второй игрок"
-        elif not red_hearts.is_alive():
+        elif not player2_hearts.is_alive():
             game_over = True
             winner = "Первый игрок"
 
