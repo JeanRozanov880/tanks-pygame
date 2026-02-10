@@ -95,8 +95,8 @@ class Tank:
         current_rect_2 = self.new_surf_2.get_rect(center=self.rect_2.center)
         return current_rect_2
 
-    def move_1(self, dx=0, dy=0, wood_boxes=None, bet_boxes=None):
-        if wood_boxes is None or bet_boxes is None:
+    def move_1(self, dx=0, dy=0, wood_boxes=None, metal_boxes=None):
+        if wood_boxes is None or metal_boxes is None:
             return
 
         old_rect = self.rect_1.copy()
@@ -109,9 +109,9 @@ class Tank:
 
         collided = False
 
-        # используем первый элемент списков wood_boxes и bet_boxes
+        # используем первый элемент списков wood_boxes и metal_boxes
         wood_box = wood_boxes[0]
-        bet_box = bet_boxes[0]
+        metal_box = metal_boxes[0]
 
         # проверяем столкновения с деревянными коробками
         for obs_rect in wood_box.get_all_obstacle_rects():
@@ -121,20 +121,20 @@ class Tank:
                     collided = True
                     break
 
-        # проверяем столкновения с бетонными коробками
+        # проверяем столкновения с металлическими коробками
         if not collided:
-            for obs_rect in bet_box.get_all_obstacle_rects():
+            for obs_rect in metal_box.get_all_obstacle_rects():
                 if self.rect_1.colliderect(obs_rect):
                     offset = (obs_rect.left - self.rect_1.left, obs_rect.top - self.rect_1.top)
-                    if self.mask_1.overlap_area(bet_box.get_obstacle_mask(obs_rect), offset) > 0:
+                    if self.mask_1.overlap_area(metal_box.get_obstacle_mask(obs_rect), offset) > 0:
                         collided = True
                         break
 
         if collided:
             self.rect_1 = old_rect
 
-    def move_2(self, dx=0, dy=0, wood_boxes=None, bet_boxes=None):
-        if wood_boxes is None or bet_boxes is None:
+    def move_2(self, dx=0, dy=0, wood_boxes=None, metal_boxes=None):
+        if wood_boxes is None or metal_boxes is None:
             return
 
         old_rect = self.rect_2.copy()
@@ -147,9 +147,9 @@ class Tank:
 
         collided = False
 
-        # используем первый элемент списков wood_boxes и bet_boxes
+        # используем первый элемент списков wood_boxes и metal_boxes
         wood_box = wood_boxes[0]
-        bet_box = bet_boxes[0]
+        metal_box = metal_boxes[0]
 
         # проверяем столкновения с деревянными коробками
         for obs_rect in wood_box.get_all_obstacle_rects():
@@ -159,12 +159,12 @@ class Tank:
                     collided = True
                     break
 
-        # проверяем столкновения с бетонными коробками
+        # проверяем столкновения с металлическими коробками
         if not collided:
-            for obs_rect in bet_box.get_all_obstacle_rects():
+            for obs_rect in metal_box.get_all_obstacle_rects():
                 if self.rect_2.colliderect(obs_rect):
                     offset = (obs_rect.left - self.rect_2.left, obs_rect.top - self.rect_2.top)
-                    if self.mask_2.overlap_area(bet_box.get_obstacle_mask(obs_rect), offset) > 0:
+                    if self.mask_2.overlap_area(metal_box.get_obstacle_mask(obs_rect), offset) > 0:
                         collided = True
                         break
 
@@ -328,48 +328,48 @@ class WoodBoxes:
             screen.blit(self.wood_surf, rect)
 
 
-class BetBoxes:
+class MetalBoxes:
     def __init__(self):
         self.wood_surf = pg.image.load('images/wood_box.png')
 
-        self.bet_surf = pg.image.load('images/beton_box.png')
-        self.cur_bet_surf = pg.transform.scale(self.bet_surf,
-                                               (self.bet_surf.get_width() / 15,
-                                                self.bet_surf.get_height() / 15))
+        self.metal_surf = pg.image.load('images/metal_box.png')
+        self.cur_metal_surf = pg.transform.scale(self.metal_surf,
+                                               (self.metal_surf.get_width() / 15,
+                                                self.metal_surf.get_height() / 15))
 
         # используем wood_size из WoodBoxes для позиционирования
         self.wood_size = self.wood_surf.get_width() / 10
-        self.bet_size = self.bet_surf.get_width() / 15
-        self.bet_surf = self.cur_bet_surf
+        self.metal_size = self.metal_surf.get_width() / 15
+        self.metal_surf = self.cur_metal_surf
 
-        self.bet_positions = [
+        self.metal_positions = [
             (233, self.wood_size - 3), (self.wood_size - 3, 263), (855, 663), (703, 855),
             (100 + self.wood_size, 835 + self.wood_size), (775 - self.wood_size, 111 - self.wood_size),
             (105 + self.wood_size * 2, 518), (117, 523 - self.wood_size),
             (96 + self.wood_size * 8, 526 - self.wood_size), (87 + self.wood_size * 10, 520)
         ]
-        self.cnt_bet_boxes = 10
+        self.cnt_metal_boxes = 10
 
         # создаем rect и маски блоков
         self.update_rects_and_masks()
 
     def update_rects_and_masks(self):
-        self.bet_rects = [pg.Rect(x, y, self.bet_size, self.bet_size)
-                          for x, y in self.bet_positions[:self.cnt_bet_boxes]]
+        self.metal_rects = [pg.Rect(x, y, self.metal_size, self.metal_size)
+                          for x, y in self.metal_positions[:self.cnt_metal_boxes]]
 
         # маски для блоков (один раз для всех одинаковых блоков)
-        self.bet_mask = pg.mask.from_surface(self.bet_surf)
+        self.metal_mask = pg.mask.from_surface(self.metal_surf)
 
     def get_all_obstacle_rects(self):
-        return self.bet_rects
+        return self.metal_rects
 
     def get_obstacle_mask(self, obs_rect):
         # аргумент obs_rect не используется, но оставляем для совместимости
-        return self.bet_mask
+        return self.metal_mask
 
-    def draw_bet_boxes(self, screen):
-        for rect in self.bet_rects:
-            screen.blit(self.bet_surf, rect)
+    def draw_metal_boxes(self, screen):
+        for rect in self.metal_rects:
+            screen.blit(self.metal_surf, rect)
 
 
 class Tree:  # класс для куста. позволяет танку стать невидимым
@@ -424,10 +424,10 @@ def collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, 
     return False
 
 
-def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_boxes):
-    # wood_boxes и bet_boxes - это списки объектов, берем первый (и единственный) элемент
+def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_boxes):
+    # wood_boxes и metal_boxes - это списки объектов, берем первый (и единственный) элемент
     wood_box = wood_boxes[0]
-    bet_box = bet_boxes[0]
+    metal_box = metal_boxes[0]
 
     # обрабатываем синие пули
     for bul_blue in bullets_blue[:]:  # копия списка для безопасного удаления
@@ -447,13 +447,13 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                         wood_broke.play()
                     break
 
-        # проверяем столкновение с бетонными коробками (не удаляем их)
+        # проверяем столкновение с металлическими коробками (не удаляем их)
         if not bullet_hit:
-            for b_rect in bet_box.bet_rects:
-                if bul_blue.bullet_rect.colliderect(b_rect):
-                    offset = (b_rect.left - bul_blue.bullet_rect.left,
-                              b_rect.top - bul_blue.bullet_rect.top)
-                    if bet_box.bet_mask.overlap(bul_blue.mask, offset):
+            for m_rect in metal_box.metal_rects:
+                if bul_blue.bullet_rect.colliderect(m_rect):
+                    offset = (m_rect.left - bul_blue.bullet_rect.left,
+                              m_rect.top - bul_blue.bullet_rect.top)
+                    if metal_box.metal_mask.overlap(bul_blue.mask, offset):
                         bullet_hit = True
                         metal_strike.play()
                         break
@@ -480,13 +480,13 @@ def collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_bo
                         wood_broke.play()
                     break
 
-        # проверяем столкновение с бетонными коробки (не удаляем их)
+        # проверяем столкновение с металлическими коробки (не удаляем их)
         if not bullet_hit:
-            for b_rect in bet_box.bet_rects:
-                if bul_red.bullet_rect.colliderect(b_rect):
-                    offset = (b_rect.left - bul_red.bullet_rect.left,
-                              b_rect.top - bul_red.bullet_rect.top)
-                    if bet_box.bet_mask.overlap(bul_red.mask, offset):
+            for m_rect in metal_box.metal_rects:
+                if bul_red.bullet_rect.colliderect(m_rect):
+                    offset = (m_rect.left - bul_red.bullet_rect.left,
+                              m_rect.top - bul_red.bullet_rect.top)
+                    if metal_box.metal_mask.overlap(bul_red.mask, offset):
                         bullet_hit = True
                         metal_strike.play()
                         break
@@ -720,7 +720,7 @@ blue_hearts = HeartsDisplay("blue")
 red_hearts = HeartsDisplay("red")
 
 wood_boxes = [WoodBoxes()]
-bet_boxes = [BetBoxes()]
+metal_boxes = [MetalBoxes()]
 trees = [Tree()]
 
 bullets_blue = []
@@ -733,7 +733,7 @@ flag_play = True
 
 def reset_game():
     """Сброс игры до начального состояния"""
-    global tank, blue_hearts, red_hearts, wood_boxes, bet_boxes, bullets_blue, bullets_red, game_over, winner
+    global tank, blue_hearts, red_hearts, wood_boxes, metal_boxes, bullets_blue, bullets_red, game_over, winner
 
     tank = Tank(player1_skin, player2_skin)
     blue_hearts.reset()
@@ -741,7 +741,7 @@ def reset_game():
 
     # создаем новые объекты коробок вместо очистки списков
     wood_boxes = [WoodBoxes()]
-    bet_boxes = [BetBoxes()]
+    metal_boxes = [MetalBoxes()]
 
     bullets_blue.clear()
     bullets_red.clear()
@@ -769,16 +769,16 @@ while flag_play:
         # прописываем движение и выстрел для 1-го игрока
         if keys[pg.K_a]:
             tank.rect_1 = tank.flip2_blue()
-            tank.move_1(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_1(dx=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_d]:
             tank.rect_1 = tank.flip1_blue()
-            tank.move_1(dx=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_1(dx=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_w]:
             tank.rect_1 = tank.flip3_blue()
-            tank.move_1(dy=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_1(dy=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_s]:
             tank.rect_1 = tank.flip4_blue()
-            tank.move_1(dy=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_1(dy=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
 
         if keys[pg.K_SPACE] and tank.can_shoot():
             tank.shoot()
@@ -788,16 +788,16 @@ while flag_play:
         # прописываем движение и выстрел для 2-го игрока
         if keys[pg.K_LEFT]:
             tank.rect_2 = tank.flip2_red()
-            tank.move_2(dx=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_2(dx=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_RIGHT]:
             tank.rect_2 = tank.flip1_red()
-            tank.move_2(dx=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_2(dx=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_UP]:
             tank.rect_2 = tank.flip3_red()
-            tank.move_2(dy=-1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_2(dy=-1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
         elif keys[pg.K_DOWN]:
             tank.rect_2 = tank.flip4_red()
-            tank.move_2(dy=1, wood_boxes=wood_boxes, bet_boxes=bet_boxes)
+            tank.move_2(dy=1, wood_boxes=wood_boxes, metal_boxes=metal_boxes)
 
         if keys[pg.K_RCTRL] and tank.can_shoot():
             tank.shoot()
@@ -808,15 +808,15 @@ while flag_play:
         collisions_bullets_with_tanks(tank, bullets_blue, bullets_red, blue_hearts, red_hearts)
 
         # проверка столкновений пуль с блоками
-        collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, bet_boxes)
+        collisions_bullets_with_blocks(bullets_blue, bullets_red, wood_boxes, metal_boxes)
 
     screen.blit(background_image, (0, 0))
 
     # отрисовываем все коробки
     for w_box in wood_boxes:
         w_box.draw_wood_boxes(screen)
-    for b_box in bet_boxes:
-        b_box.draw_bet_boxes(screen)
+    for m_box in metal_boxes:
+        m_box.draw_metal_boxes(screen)
 
     # отрисовка сердец и танков
     blue_hearts.draw(screen)
