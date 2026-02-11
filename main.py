@@ -1,6 +1,5 @@
 import pygame as pg
 
-
 FPS = 60
 W, H = 1000, 1000
 BG = (100, 170, 220)
@@ -335,8 +334,8 @@ class MetalBoxes:
 
         self.metal_surf = pg.image.load('images/metal_box.png')
         self.cur_metal_surf = pg.transform.scale(self.metal_surf,
-                                               (self.metal_surf.get_width() / 15,
-                                                self.metal_surf.get_height() / 15))
+                                                 (self.metal_surf.get_width() / 15,
+                                                  self.metal_surf.get_height() / 15))
 
         # используем wood_size из WoodBoxes для позиционирования
         self.wood_size = self.wood_surf.get_width() / 10
@@ -356,7 +355,7 @@ class MetalBoxes:
 
     def update_rects_and_masks(self):
         self.metal_rects = [pg.Rect(x, y, self.metal_size, self.metal_size)
-                          for x, y in self.metal_positions[:self.cnt_metal_boxes]]
+                            for x, y in self.metal_positions[:self.cnt_metal_boxes]]
 
         # маски для блоков (один раз для всех одинаковых блоков)
         self.metal_mask = pg.mask.from_surface(self.metal_surf)
@@ -513,8 +512,8 @@ def show_start_screen():
         font = pg.font.Font(None, 45)
         start_text_player1_1 = font.render('Управление для первого игрока:', True, (100, 200, 255))
         start_text_player1_2 = font.render('WASD, стрельба - ПРОБЕЛ', True, (100, 200, 255))
-        start_text_player2_1 = font.render('Управление для второго игрока:', True,(255, 100, 100))
-        start_text_player2_2 = font.render('стрелки, стрельба - правый CTRL', True,(255, 100, 100))
+        start_text_player2_1 = font.render('Управление для второго игрока:', True, (255, 100, 100))
+        start_text_player2_2 = font.render('стрелки, стрельба - правый CTRL', True, (255, 100, 100))
 
         # позиционируем текст
         screen.blit(start_text_player1_1, (W // 3.8 - start_text_player1_1.get_width() // 2, H // 2.6))
@@ -549,7 +548,7 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     # рамка
     frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
     frame_surf = pg.transform.scale(frame_surf,
-                                         (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
+                                    (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
     player1_frame_rect = frame_surf.get_rect(center=(W / 12, H / 3))
 
     # загружаем и масштабируем изображения танков
@@ -584,7 +583,7 @@ def show_screen_for_choose_skins():  # функция для выбора ски
 
     frame_surf = pg.image.load('images/blue_frame.png').convert_alpha()
     frame_surf = pg.transform.scale(frame_surf,
-                                         (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
+                                    (frame_surf.get_width() / 7, frame_surf.get_height() / 6))
 
     font = pg.font.Font(None, 45)
     players_font = pg.font.Font(None, 45)
@@ -695,6 +694,24 @@ def show_screen_for_choose_skins():  # функция для выбора ски
     tank = Tank(player1_skin, player2_skin)
 
 
+def reset_game():
+    """Сброс игры до начального состояния"""
+    global tank, player1_hearts, player2_hearts, wood_boxes, metal_boxes, bullets_player1, bullets_player2, game_over, winner
+
+    tank = Tank(player1_skin, player2_skin)
+    player1_hearts.reset()
+    player2_hearts.reset()
+
+    # создаем новые объекты коробок вместо очистки списков
+    wood_boxes = [WoodBoxes()]
+    metal_boxes = [MetalBoxes()]
+
+    bullets_player1.clear()
+    bullets_player2.clear()
+    game_over = False
+    winner = ""
+
+
 pg.init()
 
 wood_broke = pg.mixer.Sound('sounds/wood_broke.wav')
@@ -729,25 +746,6 @@ bullets_player2 = []
 game_over = False
 winner = ''
 flag_play = True
-
-
-def reset_game():
-    """Сброс игры до начального состояния"""
-    global tank, player1_hearts, player2_hearts, wood_boxes, metal_boxes, bullets_player1, bullets_player2, game_over, winner
-
-    tank = Tank(player1_skin, player2_skin)
-    player1_hearts.reset()
-    player2_hearts.reset()
-
-    # создаем новые объекты коробок вместо очистки списков
-    wood_boxes = [WoodBoxes()]
-    metal_boxes = [MetalBoxes()]
-
-    bullets_player1.clear()
-    bullets_player2.clear()
-    game_over = False
-    winner = ""
-
 
 while flag_play:
     clock.tick(FPS)
